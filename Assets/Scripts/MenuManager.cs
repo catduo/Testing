@@ -20,10 +20,11 @@ public class MenuManager : MonoBehaviour, IJoviosPlayerListener, IJoviosControll
 	bool IJoviosPlayerListener.PlayerConnected(JoviosPlayer p){
 		Debug.Log (p.GetPlayerName());
 		JoviosControllerStyle controllerStyle = new JoviosControllerStyle();
-		controllerStyle.AddButton1("left", "Press the button2!", "testButton2");
+		controllerStyle.AddAbsoluteJoystick("left", "woot!", "testButton2");
 		controllerStyle.AddButton2("right", new string[] {"Press the button1!"}, new string[] {"testButton1"});
+		controllerStyle.AddArbitraryButton(new int[] {-2, 6, 4, 4}, "new button", "response");
 		//controllerStyle.SetTextInput("What is your quest?", "Submit");
-		controllerStyle.SetAccelerometerStyle(JoviosControllerAccelerometerStyle.Full);
+		//controllerStyle.SetAccelerometerStyle(JoviosControllerAccelerometerStyle.Full);
 		jovios.SetControls(p.GetUserID(), controllerStyle);
 		jovios.AddControllerListener(this);
 		return false;
