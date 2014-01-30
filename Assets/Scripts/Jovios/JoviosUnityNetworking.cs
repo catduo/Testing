@@ -22,7 +22,8 @@ public class JoviosUnityNetworking : MonoBehaviour {
 	
 	private static Jovios jovios;
 	private string gameName;
-	
+
+	//this is called to setup the unity networking
 	public static Jovios Create(){
 		GameObject joviosGameObject = new GameObject();
 		joviosGameObject.AddComponent<Jovios>();
@@ -34,7 +35,8 @@ public class JoviosUnityNetworking : MonoBehaviour {
 		jovios = joviosGameObject.GetComponent<Jovios>();
 		return joviosGameObject.GetComponent<Jovios>();
 	}
-	
+
+	//this starts the unity server
     public void StartServer(int maxPlayers = 32, int portNumber = 25000){
 		Application.runInBackground = true;
         Network.InitializeServer(32, 25002, !Network.HavePublicAddress());
@@ -45,7 +47,8 @@ public class JoviosUnityNetworking : MonoBehaviour {
 			SetGameName("bbbb");
 		}
     } 
-	
+
+	//this is the external IP gained from either the website or the unity system
 	private string externalIP;
 	IEnumerator GetIP(){
 		WWW www = new WWW("http://checkip.dyndns.org");
@@ -71,11 +74,13 @@ public class JoviosUnityNetworking : MonoBehaviour {
 	private WWW wwwData = null;
 	private List<NetworkPlayer> networkPlayers = new List<NetworkPlayer>();
 	private const string typeName = "Jovios";
-	
+
+	//this disconnects when the application quits
 	void OnApplicationQuit(){
 		Network.Disconnect();
 	}
-	
+
+	//this sets the gamename
 	private void SetGameName(string newGameName){
 		if(newGameName.Length == 4){
 			gameName = newGameName;
@@ -86,7 +91,8 @@ public class JoviosUnityNetworking : MonoBehaviour {
 		jovios.SetGameName(gameName);
 		StartCoroutine("GetIP");
 	}    
-	
+
+	//if this is in the web player it will download a new game
 	public IEnumerator WaitForDownload(){    
         yield return wwwData;
         wwwData.LoadUnityWeb();  
@@ -96,7 +102,8 @@ public class JoviosUnityNetworking : MonoBehaviour {
         wwwData = new WWW(url);
         StartCoroutine("WaitForDownload");
 	}
-	
+
+	//this is the unity newtorkign connection and disconnection information
 	void OnPlayerConnected(NetworkPlayer player){
 		networkPlayers.Add(player);
 		networkView.RPC ("PlayerObjectCreated", player, jovios.GetPlayerCount());
@@ -110,7 +117,7 @@ public class JoviosUnityNetworking : MonoBehaviour {
 	}   
 	
 	
-	
+	//these are the rpc calls for the unity networking
 	[RPC] void GetDirection(int userID, float horizontal, float vertical, string side){
 		jovios.GetPlayer(new JoviosUserID(userID)).GetInput(side).SetDirection(new Vector2(horizontal, vertical));
 	}
@@ -127,7 +134,8 @@ public class JoviosUnityNetworking : MonoBehaviour {
 			}
 		}
 	}
-	
+
+	//here is the information returned for instantiating and updating the JoviosPlayer object
 	[RPC] public void InstantiatePlayerObject(int playerNumber, float primaryR, float primaryG, float primaryB, float secondaryR, float secondaryG, float secondaryB, string playerName, int userID){
 		if(jovios.GetPlayer(playerNumber) == null){
 			jovios.PlayerConnected(playerNumber, primaryR, primaryG, primaryB, secondaryR, secondaryG, secondaryB, playerName, userID);
@@ -136,7 +144,8 @@ public class JoviosUnityNetworking : MonoBehaviour {
 			jovios.PlayerUpdated(playerNumber, primaryR, primaryG, primaryB, secondaryR, secondaryG, secondaryB, playerName, userID);
 		}
 	}
-	
+
+	//blank rpc calls for all the calls going from the game to the controller, unity requries these blanks in order to call then via RPC
 	[RPC] private void SentControls(int accelerometerSetting, string lControls, string lControlsResponse, string lControlsDescription, string rControls, string rControlsResponse, string rControlsDescription){}
 	[RPC] private void PlayerObjectCreated(int player){}
 	[RPC] private void EndOfRound(int player){}

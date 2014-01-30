@@ -120,6 +120,9 @@ public class Jovios : MonoBehaviour {
 	
 	// this will trigger when a player disconnects,
 	public void PlayerDisconnected(JoviosPlayer p){
+		for(int i = 0; i < p.PlayerObjectCount(); i++){
+			Destroy(p.GetPlayerObject(i));
+		}
 		foreach(IJoviosPlayerListener listener in playerListeners){
 			if(listener.PlayerDisconnected(p)){
 				break;
